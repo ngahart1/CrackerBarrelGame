@@ -1,4 +1,5 @@
 import sys
+import random
 
 """
 A Python game of Jump-All-But-One, the game
@@ -47,9 +48,12 @@ def getNumRows():
 
 
 def main(num_rows = 5):
-    num_holes = lambda x: int(x*(x+1)/2)
+    getNumHoles = lambda x: int(x*(x+1)/2)
     num_rows = getNumRows()
-    board = ['o'] * num_holes(num_rows)
+    num_holes = getNumHoles(num_rows)
+    board = ['x'] * num_holes
+    # one empty location to start, randomly chosen
+    board[random.randint(0, num_holes - 1)] = 'o'
     print_board(board, num_rows)
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import sys
 import random
+import Error as e
 
 """
 A Python game of Jump-All-But-One, the game
@@ -43,9 +44,14 @@ def print_board(vec):
 
 
 def makeMove(board):
-    jumper = getJump(board, 'x', 'jumping peg')
-    jumpTo = getJump(board, 'x', 'hole to jump to')
-    board[inBetween(board, jumper, jumpTo)] = 'o'
+    while True:
+        jumper = getJump(board, 'x', 'jumping peg')
+        jumpTo = getJump(board, 'o', 'hole to jump to')
+        try:
+            board[inBetween(jumper, jumpTo)] = 'o'
+            break
+        except e.InvalidJumpError:
+            print('Invalid jump!')
     board[jumper] = 'o'
     board[jumpTo] = 'x'
 
@@ -53,8 +59,67 @@ def makeMove(board):
 Returns the index of the hole in between the given
 x and y on the given game board.
 """
-def inBetween(board, x, y):
-    global num_rows
+def inBetween(x, y):
+    if x > y:
+        temp = x
+        x = y
+        y = temp
+    linex = getLineOfHole(x)
+    liney = getLineOfHole(y)
+    print('linex:', linex, 'liney:', liney)
+    # first condition: if on same line, then
+    # must be exactly two away for valid jump
+    if liney == linex:
+        if y - x == 2:
+            return y - 1
+        else:
+            raise e.InvalidJumpError()
+    # second condition: if on different lines, those
+    # lines must be two apart, leaving room for a piece
+    # to be jumped but not too far of a jump
+    elif liney - linex != 2:
+        raise e.InvalidJumpError()
+    # lastly, if on lines 2 apart must follow the rule:
+    # going up 2 lines to the left, as would be required for a
+    # legal jump, requires a difference of (2*line_no) + 1
+    # going up 2 lines to the right, as would be required for a
+    # legal jump in that direction, requires difference of
+    # (2*line_no) - 1, where line_no is the greater of the line
+    # numbers of the two holes
+    else:
+        if x == y - (2*liney + 1):
+            # going up left
+            return y - (liney + 1)
+        elif x == y - (2*liney - 1):
+            # going up right
+            return y - liney
+        else:
+            raise e.InvalidJumpError()
+
+
+"""
+Finds the line of the board on which the given hole
+resides.
+Line            Picture
+0                   0
+1                  1 2
+2                 3 4 5
+3                6 7 8 9
+    etc.
+"""
+def getLineOfHole(num):
+    # triangular numbers are 0, 1, 3, 6,...
+    # line starts at line 0
+    triangular = lambda x: x*(x+1)/2
+    line = 0
+    beginningOfLine = 0
+    while num > beginningOfLine:
+        line += 1
+        beginningOfLine = triangular(line)
+    if beginningOfLine > num:
+        line -= 1
+    return line
+
 
 
 """
@@ -95,6 +160,7 @@ is over. Returns true if there are no possible moves,
 returns false if move is possible
 """
 def finished(board):
+
     return False
 
 

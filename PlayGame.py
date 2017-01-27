@@ -21,6 +21,13 @@ etc.
 
 num_rows = 0
 
+from enum import Enum
+
+class GameStates(Enum):
+    WINNER = 1
+    LOSER = 2
+    KEEP_GOING = 3
+
 """
 'x' indicates hole is full
 'o' indicates hole is empty
@@ -54,6 +61,7 @@ def makeMove(board):
             print('Invalid jump!')
     board[jumper] = 'o'
     board[jumpTo] = 'x'
+    return board
 
 """
 Returns the index of the hole in between the given
@@ -66,7 +74,6 @@ def inBetween(x, y):
         y = temp
     linex = getLineOfHole(x)
     liney = getLineOfHole(y)
-    print('linex:', linex, 'liney:', liney)
     # first condition: if on same line, then
     # must be exactly two away for valid jump
     if liney == linex:
@@ -155,13 +162,28 @@ def getNumRows():
 
 
 """
-A function to determine whether or not the game
-is over. Returns true if there are no possible moves,
-returns false if move is possible
+A function to determine current game board status.
+Returns from the enum defined globally, with options
+for win, loss, or keep going.
 """
-def finished(board):
+def status(board):
+    # first, check if only one more peg
+    if sum([hole == 'x' for hole in board]) == 1:
+        return GameStates.WINNER
+    elif lost(board):
+        return GameStates.LOSER
+    return GameStates.KEEP_GOING
 
-    return False
+"""
+returns true if the board situation indicates the game is
+over, false if there are still possible jumps
+"""
+def lost(board):
+    for i in range(len(board)):
+        if board[i] == 'x':
+            rowHere = getLineOfHole(i)
+            possibilities = [i+2 i-2 ]
+    return True
 
 
 def setupBoard():
@@ -177,12 +199,16 @@ def setupBoard():
     return board
 
 
-def main(num_rows = 5):
+def main():
     board = setupBoard()
     print_board(board)
-    while not finished(board):
+    while status(board) == GameStates.KEEP_GOING:
         board = makeMove(board)
         print_board(board)
+    if status(board) == GameStates.WINNER:
+        print('Congratulations, you have won!!!')
+    elif status(board) == GameStates.LOSER:
+        print('Sorry, you have lost')
 
 if __name__ == "__main__":
     main()

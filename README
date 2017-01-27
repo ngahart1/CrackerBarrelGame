@@ -1,2 +1,18 @@
 A Python rendering of the "Jump All But One"
 game found on tables at Cracker Barrel.
+
+To jump, one must enter the position numbers
+of the peg and jump to location. The position
+numbers are laid out as follows:
+            0
+           1 2
+          3 4 5
+         6 7 8 9
+      10 11 12 13 14
+etc.
+
+The game ends once 'q' is entered.
+
+When the board is printed, all locations with
+'x' have a peg, 'o' are empty. The visual idea
+was the bird's-eye view.

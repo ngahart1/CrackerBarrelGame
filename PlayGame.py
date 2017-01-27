@@ -142,7 +142,11 @@ def getJump(board, char, seeking):
     while not haveValue:
         try:
             print('Location of ', seeking, ': ', sep = '', end = '')
-            value = int(input())
+            inp = input()
+            if inp == 'q':
+                print('You have entered q, so the game is over')
+                exiter(board)
+            value = int(inp)
         except ValueError:
             print('Must give integer location')
         if value >= len(board) or value < 0 or board[value] != char:
@@ -150,6 +154,24 @@ def getJump(board, char, seeking):
         else:
             haveValue = True
     return value
+
+def exiter(board):
+    numLeft = sum([hole == 'x' for hole in board])
+    res = resultName(numLeft)
+    print('There are ', numLeft, ' pegs remaining, so ', res, '!', sep = '')
+    exit()
+
+def resultName(num):
+    if num == 1:
+        return 'you are a genius'
+    elif num == 2:
+        return 'you are pretty smart'
+    elif num == 3:
+        return 'you are just average'
+    elif num == 4:
+        return 'you are just plain dumb'
+    else:
+        return 'you are an eg-no-ra-mus'
 
 
 def getNumRows():
@@ -169,22 +191,32 @@ for win, loss, or keep going.
 def status(board):
     # first, check if only one more peg
     if sum([hole == 'x' for hole in board]) == 1:
-        return GameStates.WINNER
-    elif lost(board):
-        return GameStates.LOSER
+        exiter(board)
+    #elif lost(board):
+    #    return GameStates.LOSER
     return GameStates.KEEP_GOING
 
 """
 returns true if the board situation indicates the game is
 over, false if there are still possible jumps
 """
-def lost(board):
+'''def lost(board):
+    # i is a hole that might contain the jumping peg
+    # j is a hole that might contain the hole to be
+    # jumped into
     for i in range(len(board)):
         if board[i] == 'x':
-            rowHere = getLineOfHole(i)
-            possibilities = [i+2 i-2 ]
-    return True
+            for j in range(len(board)):
+                if board[j] == 'o':
+                    try:
+                        between = inBetween(i, j)
+                        if board[between] == 'x':
+                            return False
+                    except e.InvalidJumpError:
+                        break
 
+   return True
+'''
 
 def setupBoard():
     getNumHoles = lambda x: int(x * (x + 1) / 2)
